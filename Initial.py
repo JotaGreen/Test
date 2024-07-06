@@ -27,10 +27,11 @@ class Card:
         self.inkwell = inkwell
 
     def __str__(self):
-        return f'Card {self.name} ({self.color} {self.card_type}, inkwell symbol {self.inkwell}, cost {self.cost})'
+        return f'{self.name}'
     
 class Character(Card):
-    def __init__(self, name: str, card_type: CardType, color: CardColor, cost: int, inkwell: bool, strength: int, willpower: int, lore: int):
+    def __init__(self, name: str, card_type: CardType, color: CardColor, cost: int, 
+                 inkwell: bool, strength: int, willpower: int, lore: int):
         super().__init__(name, card_type, color, cost, inkwell)
         self.strength = strength
         self.willpower = willpower
