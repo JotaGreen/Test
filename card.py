@@ -24,7 +24,12 @@ class CardColor(Enum):
 
 class Card:
     def __init__(
-        self, name: str, card_type: CardType, color: CardColor, cost: int, inkable: bool
+        self, 
+        name: str, 
+        card_type: CardType, 
+        color: CardColor, 
+        cost: int, 
+        inkable: bool
     ):
         self.name = name
         self.card_type = card_type
@@ -39,13 +44,22 @@ class Card:
     def onPlay(self):
         print(f"{self.name} was played.")
 
+    def onPlayerTurnStart(self):
+        pass
+
+    def onPlayerTurnEnd(self):
+        pass
+
+    def onThisTurnEnd(self):
+        pass
+
 
 class CharacterClassification(Enum):
     STORYBORN = "Storyborn"
     DREAMBORN = "Dreamborn"
     FLOODBORN = "Floodborn"
     ALIEN = "Alien"
-    ALLY ="Ally"
+    ALLY = "Ally"
     BROOM = "Broom"
     CAPTAIN = "Captain"
     DEITY = "Deity"
@@ -89,6 +103,8 @@ class Character(Card):
         dry: bool = False,
         exterted: bool = False,
         damageCounters: int = 0,
+        #Properties related to gameplay
+        doNotReadyNextTurn: bool = False,
     ):
         super().__init__(name, CardType.CHARACTER, color, cost, inkable)
         self.baseName = baseName
@@ -101,7 +117,6 @@ class Character(Card):
         self.dry = dry
         self.exterted = exterted
         self.damageCounters = damageCounters
-
 
 class Location(Card):
     def __init__(
@@ -126,6 +141,20 @@ class Location(Card):
         self.moveCost = moveCost
         self.abilities = abilities
         self.damageCounters = damageCounters
+
+class Item(Card):
+    def __init__(
+        self,
+        name: str,
+        color: CardColor,
+        cost: int,
+        inkable: bool,
+        abilities: str,
+        exerted: bool = False,
+    ):
+        super().__init__(name, CardType.ITEM, color, cost, inkable)
+        self.abilities = abilities
+        self.exerted = exerted
 
 
 class Action(Card):
@@ -152,65 +181,3 @@ class Song(Card):
     ):
         super().__init__(name, CardType.SONG, color, cost, inkable)
         self.abilities = abilities
-
-
-class Item(Card):
-    def __init__(
-        self,
-        name: str,
-        color: CardColor,
-        cost: int,
-        inkable: bool,
-        abilities: str,
-        exerted: bool = False,
-    ):
-        super().__init__(name, CardType.ITEM, color, cost, inkable)
-        self.abilities = abilities
-        self.exerted = exerted
-
-
-class Deck:
-    def __init__(self, player: str, cards: list[Card]):
-        self.player = player
-        self.cards = cards
-
-    def __str__(self):
-        return f"{self.player}'s deck"
-
-    def parseDeckList(self, deckList: str):
-        #This function will parse a multiline string of card quantities and names and will add instances of the corresponding cards to the deck.cards
-        #An example of a deckList string would be:
-        # 2 Ariel - On Human Legs
-        # 1 Ariel - Spectacular Singer
-        # 4 Be Our Guest
-        # The card names should match the names of instances of the card subclasses in the CardsSet01.py file
-        # When complete, it should print the number of cards added to the deck and the names of cards which were not found in the CardsSet01.py file
-        deckList = deckList.split("\n") #Split the multiline string into a list of strings 
-        cardsNotFound = []
-        cardsAdded = 0
-        for card in deckList:
-            card = card.split(" ")
-            quantity = int(card[0])
-            cardName = " ".join(card[1:])
-            cardFound = False
-            for cardTypeClass in Card.__subclasses__():
-                for cardClass in cardTypeClass.__subclasses__():
-                    if cardClass().name == cardName:
-                        for i in range(quantity):
-                            self.cards.append(cardClass())
-                            cardsAdded += 1
-                        cardFound = True
-                        break
-            if not cardFound:
-                cardsNotFound.append(cardName)
-        print(f"{cardsAdded} cards added to the deck.")
-        if cardsNotFound:
-            print("The following cards were not found:")
-            for card in cardsNotFound:
-                print(card)
-
-    def shuffle(self):
-        self.cards = random.shuffle(self.cards)
-
-    def getTop(self, num: int = 1):
-        return self.cards[:num]

@@ -1,7 +1,7 @@
-# Classes representing the models of the cards in the game. 
+# Classes representing the models of the cards in the game.
 # Each of these card model classes are subclasses of one of the Card subclassess: Character, Location, Action, Song, and Item.
 
-from MainClasses import *
+from card import *
 
 
 class Card_01_001(Character):
