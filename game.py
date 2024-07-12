@@ -1,10 +1,12 @@
 from player import *
+from helperfunctions import *
 
 
 class Game:
     def __init__(self):
         self.players = [Player("Player 1"), Player("Player 2")]
         self.firstTurn = True
+        self.turn = None
 
     # This function will start the game
     # First it will ask for the deck list of each player and parse it into the player's deck
@@ -25,12 +27,14 @@ class Game:
             print("\n")
             deckList = input(f"{player.name}, enter your deck list: ")
             print("\n")
-            player.deck.parseDeckList(deckList)
+            player.deck.cards = parseDeckList(deckList)
             player.deck.shuffle()
-            player.draw(7)
+            player.hand += player.deck.getTop(num=7, print=False)
+            print(f"{self.name} drew 7 cards.")
         for player in self.players:
             print(f"\n{player.name}'s hand:")
-            printListOfCards(player.hand)
+            for card in player.hand:
+                printCard(card)
             mulligan = input(
                 f"{player.name}, which cards do you want to mulligan? Enter the card names separated by semicolons and space '; ' "
             )
@@ -51,8 +55,22 @@ class Game:
 
             print(f"{player.name} will mulligan {len(mulliganCards)} cards.")
             player.deck.placeOnBottom(mulliganCards)
-            player.draw(len(mulliganCards))
+            player.hand += player.deck.getTop(num=len(mulliganCards), print=False)
+            print(f"{self.name} drew {len(mulliganCards)} cards.")
             player.deck.shuffle()
+
+    def run(self):
+        self.start()
+
+        while self.players[0].lore < 20 and self.players[1].lore < 20:
+            try:
+                for player in self.players:
+                    self.turn = Turn(activePlayer=player, game=self)
+                    self.turn.run()
+            except PlayerDeckedOut as e:
+                print(e)
+                print("Game over")
+                break
 
 
 class Turn:
@@ -61,8 +79,13 @@ class Turn:
         self.game = game
         self.playerInked = False
 
+    def run(self):
+        self.beginningPhase()
+        self.mainPhase()
+        self.endPhase()
+
     def beginningPhase(self):
-        print(f"{self.player.name}'s turn.")
+        print(f"Beginning {self.player.name}'s turn.")
         # Unexert all cards in play
         print(f"Readying all {self.player.name}'s characters, items, and ink in play.")
         self.player.inkExerted = 0
@@ -105,7 +128,8 @@ class Turn:
         self.resolveBag()
 
     def mainPhase(self):
-        pass
+        self.player.lore += 1
+        print(f"{self.player.name} gained 1 lore.")
 
     def endPhase(self):
         # Trigger the end of turn effects for all cards in play

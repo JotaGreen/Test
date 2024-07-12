@@ -24,12 +24,7 @@ class CardColor(Enum):
 
 class Card:
     def __init__(
-        self, 
-        name: str, 
-        card_type: CardType, 
-        color: CardColor, 
-        cost: int, 
-        inkable: bool
+        self, name: str, card_type: CardType, color: CardColor, cost: int, inkable: bool
     ):
         self.name = name
         self.card_type = card_type
@@ -37,9 +32,6 @@ class Card:
         self.cost = cost
         self.inkable = inkable
         self.id = str(uuid.uuid4())
-
-    def __str__(self):
-        return f"{self.name}, id: {self.id}"
 
     def onPlay(self):
         print(f"{self.name} was played.")
@@ -85,6 +77,70 @@ class CharacterClassification(Enum):
     TITAN = "Titan"
     VILLAIN = "Villain"
 
+    @property
+    def shortened(self):
+        match self.value:
+            case "Storyborn":
+                return "Storyb"
+            case "Dreamborn":
+                return "Dreamb"
+            case "Floodborn":
+                return "Floodb"
+            case "Alien":
+                return "Alien"
+            case "Ally":
+                return "Ally"
+            case "Broom":
+                return "Broom"
+            case "Captain":
+                return "Cptn"
+            case "Deity":
+                return "Deity"
+            case "Detective":
+                return "Dtctv"
+            case "Dragon":
+                return "Dragon"
+            case "Fairy":
+                return "Fairy"
+            case "Hero":
+                return "Hero"
+            case "Hyena":
+                return "Hyena"
+            case "Inventor":
+                return "Invt"
+            case "King":
+                return "King"
+            case "Knight":
+                return "Knght"
+            case "Madrigal":
+                return "Mdrgl"
+            case "Mentor":
+                return "Mentor"
+            case "Musketeer":
+                return "Msktr"
+            case "Pirate":
+                return "Pirat"
+            case "Prince":
+                return "Prnc"
+            case "Princess":
+                return "Prncs"
+            case "Puppy":
+                return "Puppy"
+            case "Queen":
+                return "Queen"
+            case "Seven Dwarfs":
+                return "7Dwfs"
+            case "Sorcerer":
+                return "Sorcr"
+            case "Tigger":
+                return "Tiggr"
+            case "Titan":
+                return "Titan"
+            case "Villain":
+                return "Villn"
+            case _:
+                return self.value
+
 
 class Character(Card):
     def __init__(
@@ -103,7 +159,7 @@ class Character(Card):
         dry: bool = False,
         exterted: bool = False,
         damageCounters: int = 0,
-        #Properties related to gameplay
+        # Properties related to gameplay
         doNotReadyNextTurn: bool = False,
     ):
         super().__init__(name, CardType.CHARACTER, color, cost, inkable)
@@ -117,6 +173,7 @@ class Character(Card):
         self.dry = dry
         self.exterted = exterted
         self.damageCounters = damageCounters
+
 
 class Location(Card):
     def __init__(
@@ -141,6 +198,7 @@ class Location(Card):
         self.moveCost = moveCost
         self.abilities = abilities
         self.damageCounters = damageCounters
+
 
 class Item(Card):
     def __init__(
@@ -181,3 +239,24 @@ class Song(Card):
     ):
         super().__init__(name, CardType.SONG, color, cost, inkable)
         self.abilities = abilities
+
+
+def printCard(card: Card):
+    # This function will print a card in a formatted way
+    nameAndCost = f"   >>>  {card.name}. C:{card.cost}{'i' if card.inkable else ''}, "
+    stats = ""
+    match card.card_type:
+        case CardType.CHARACTER:
+            classifications = ", ".join([c.shortened for c in card.classifications])
+            stats = f"S:{card.strength}, W:{card.willpower}, L:{card.lore}, {classifications}"
+        case CardType.LOCATION:
+            stats = f"M:{card.moveCost}, W:{card.willpower}, L:{card.lore}"
+        case CardType.ITEM:
+            stats = "Item"
+        case CardType.ACTION:
+            stats = "Action"
+        case CardType.SONG:
+            stats = "Song"
+    abilities = ". " + card.abilities if card.abilities else ""
+    fullText = nameAndCost + stats + abilities
+    print(fullText)
